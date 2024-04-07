@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"start": "bun ./build/index.js",
-		"dev": "bunx --bun vite",
+		"dev": "bun vite",
 		"build": "bunx --bun vite build",
 		"preview": "bun vite preview",
 		"test": "bun run test:integration && bun run test:unit",

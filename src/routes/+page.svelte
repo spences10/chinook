@@ -36,16 +36,12 @@
 
 <input
 	type="search"
-	placeholder="Search..."
+	placeholder="Search tracks, titles, albums, artists, genres..."
 	class="input input-bordered input-primary mb-10 w-full"
 	value={search_term}
 	on:keyup={handle_search}
 	on:input={handle_input}
 />
-
-<p class="mb-2 text-xl font-bold">
-	<a href="/genre" class="link link-primary">Genres</a>
-</p>
 
 <p class="mb-2 text-xl font-light">
 	This is the initial 50 tracks from the Chinook database
