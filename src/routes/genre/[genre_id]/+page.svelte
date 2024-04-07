@@ -4,6 +4,10 @@
 	const { albums, genre } = data;
 </script>
 
+<svelte:head>
+	<title>{genre} - Chinook SvelteKit</title>
+</svelte:head>
+
 <h1 class="mb-5 text-4xl font-bold text-primary">
 	<a href="/genre">
 		{genre}

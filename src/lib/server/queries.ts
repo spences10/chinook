@@ -41,6 +41,7 @@ export const get_album_by_id = async (album_id: number) => {
 	const album = await client.execute({
 		sql: `SELECT 
 							a.Title AS AlbumTitle, 
+							t.TrackId, 
 							t.Name AS TrackName, 
 							at.Name AS ArtistName,
 							(t.Milliseconds / 60000) || 'm ' || ((t.Milliseconds % 60000) / 1000) || 's' AS Duration

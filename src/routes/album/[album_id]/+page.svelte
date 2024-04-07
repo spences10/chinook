@@ -4,6 +4,10 @@
 	const { artist, album, tracks } = data;
 </script>
 
+<svelte:head>
+	<title>{album} - Chinook SvelteKit</title>
+</svelte:head>
+
 <h1 class="mb-5 text-4xl font-bold text-primary">{album}</h1>
 <p class="mb-10 text-3xl font-bold tracking-widest text-secondary">
 	By {artist}
@@ -24,7 +28,14 @@
 			{#each tracks as track, i}
 				<tr class:hover={'bg-base-200'}>
 					<td>{i + 1}</td>
-					<td>{track.TrackName}</td>
+					<td>
+						<a
+							href={`/track/${track.TrackId}`}
+							class="link link-primary"
+						>
+							{track.TrackName}
+						</a>
+					</td>
 					<td>{track.Duration}</td>
 				</tr>
 			{/each}

@@ -11,6 +11,10 @@
 	</a>
 </p>
 
+<svelte:head>
+	<title>{track_name} - Chinook SvelteKit</title>
+</svelte:head>
+
 <div class="text-xl">
 	<p><strong>Album Title:</strong> {track[0].AlbumTitle}</p>
 	<p><strong>Genre Name:</strong> {track[0].GenreName}</p>

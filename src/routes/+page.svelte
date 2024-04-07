@@ -30,6 +30,10 @@
 	};
 </script>
 
+<svelte:head>
+	<title>Music Search - Chinook SvelteKit</title>
+</svelte:head>
+
 <input
 	type="search"
 	placeholder="Search..."
@@ -38,6 +42,10 @@
 	on:keyup={handle_search}
 	on:input={handle_input}
 />
+
+<p class="mb-2 text-xl font-bold">
+	<a href="/genre" class="link link-primary">Genres</a>
+</p>
 
 <p class="mb-2 text-xl font-light">
 	This is the initial 50 tracks from the Chinook database
@@ -76,7 +84,7 @@
 					</td>
 					<td>
 						<a
-							href={`/album/${track.TrackId}`}
+							href={`/album/${track.AlbumId}`}
 							class="link link-primary"
 						>
 							{track.Title}

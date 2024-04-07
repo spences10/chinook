@@ -4,6 +4,10 @@
 	const { artist, albums } = data;
 </script>
 
+<svelte:head>
+	<title>{artist} - Chinook SvelteKit</title>
+</svelte:head>
+
 <h1 class="mb-5 text-4xl font-bold text-primary">{artist}</h1>
 <p class="mb-10 text-3xl font-bold tracking-widest text-secondary">
 	Albums
