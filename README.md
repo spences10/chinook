@@ -1,5 +1,20 @@
 # chinook
 
+This is a SvelteKit project built with the
+[Chinook database schema](https://www.sqlitetutorial.net/sqlite-sample-database/)
+for SQLite.
+
+Uses Turso, SvelteKit v2, Svelte v5, TailwindCSS and daisyUI.
+
+Heavily inspried by this
+[SvelteKit 1.0 with SQLite Tutorial](https://www.youtube.com/watch?v=iO4VUbQ6ua4)
+by [Philipp Hartenfeller](https://github.com/phartenfeller)
+
+It uses a Full Text Search (FTS5) table for a fuzzy search on the main
+page.
+
+Linked with routes for Track, Artist, Album and Genre.
+
 Do a fuzzy search on the main select:
 
 ```sql
