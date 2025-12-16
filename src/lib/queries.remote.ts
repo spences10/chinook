@@ -1,0 +1,261 @@
+import { query } from '$app/server';
+import { db } from '$lib/server/db';
+import * as v from 'valibot';
+
+const idSchema = v.number();
+
+export const get_artist = query(idSchema, async (id) => {
+	const artist = db
+		.query<
+			{ ArtistId: number; Name: string },
+			{ id: number }
+		>(`SELECT ArtistId, Name FROM artists WHERE ArtistId = $id`)
+		.get({ id });
+
+	if (!artist) return null;
+
+	const albums = db
+		.query<
+			{ AlbumId: number; Title: string; track_count: number },
+			{ id: number }
+		>(
+			`SELECT al.AlbumId, al.Title, COUNT(t.TrackId) as track_count
+			 FROM albums al
+			 LEFT JOIN tracks t ON al.AlbumId = t.AlbumId
+			 WHERE al.ArtistId = $id
+			 GROUP BY al.AlbumId
+			 ORDER BY al.Title`,
+		)
+		.all({ id });
+
+	return { artist, albums };
+});
+
+export const get_album = query(idSchema, async (id) => {
+	const album = db
+		.query<
+			{
+				AlbumId: number;
+				Title: string;
+				ArtistId: number;
+				ArtistName: string;
+			},
+			{ id: number }
+		>(
+			`SELECT al.AlbumId, al.Title, al.ArtistId, a.Name as ArtistName
+			 FROM albums al
+			 JOIN artists a ON al.ArtistId = a.ArtistId
+			 WHERE al.AlbumId = $id`,
+		)
+		.get({ id });
+
+	if (!album) return null;
+
+	const tracks = db
+		.query<
+			{ TrackId: number; Name: string; Milliseconds: number },
+			{ id: number }
+		>(
+			`SELECT TrackId, Name, Milliseconds
+			 FROM tracks
+			 WHERE AlbumId = $id
+			 ORDER BY TrackId`,
+		)
+		.all({ id });
+
+	return { album, tracks };
+});
+
+export const get_track = query(idSchema, async (id) => {
+	return db
+		.query<
+			{
+				TrackId: number;
+				Name: string;
+				AlbumId: number;
+				AlbumTitle: string;
+				ArtistId: number;
+				ArtistName: string;
+				GenreId: number;
+				GenreName: string;
+				MediaType: string;
+				Composer: string | null;
+				Milliseconds: number;
+				Bytes: number;
+				UnitPrice: number;
+			},
+			{ id: number }
+		>(
+			`SELECT t.TrackId, t.Name, t.AlbumId, al.Title as AlbumTitle,
+			        a.ArtistId, a.Name as ArtistName, t.GenreId, g.Name as GenreName,
+			        mt.Name as MediaType, t.Composer, t.Milliseconds, t.Bytes, t.UnitPrice
+			 FROM tracks t
+			 LEFT JOIN albums al ON t.AlbumId = al.AlbumId
+			 LEFT JOIN artists a ON al.ArtistId = a.ArtistId
+			 LEFT JOIN genres g ON t.GenreId = g.GenreId
+			 LEFT JOIN media_types mt ON t.MediaTypeId = mt.MediaTypeId
+			 WHERE t.TrackId = $id`,
+		)
+		.get({ id });
+});
+
+export const get_genre = query(idSchema, async (id) => {
+	const genre = db
+		.query<
+			{ GenreId: number; Name: string },
+			{ id: number }
+		>(`SELECT GenreId, Name FROM genres WHERE GenreId = $id`)
+		.get({ id });
+
+	if (!genre) return null;
+
+	const tracks = db
+		.query<
+			{
+				TrackId: number;
+				Name: string;
+				ArtistName: string;
+				AlbumTitle: string;
+				Milliseconds: number;
+			},
+			{ id: number }
+		>(
+			`SELECT t.TrackId, t.Name, a.Name as ArtistName, al.Title as AlbumTitle, t.Milliseconds
+			 FROM tracks t
+			 LEFT JOIN albums al ON t.AlbumId = al.AlbumId
+			 LEFT JOIN artists a ON al.ArtistId = a.ArtistId
+			 WHERE t.GenreId = $id
+			 ORDER BY t.Name
+			 LIMIT 50`,
+		)
+		.all({ id });
+
+	return { genre, tracks };
+});
+
+export const get_playlist = query(idSchema, async (id) => {
+	const playlist = db
+		.query<
+			{ PlaylistId: number; Name: string },
+			{ id: number }
+		>(`SELECT PlaylistId, Name FROM playlists WHERE PlaylistId = $id`)
+		.get({ id });
+
+	if (!playlist) return null;
+
+	const tracks = db
+		.query<
+			{
+				TrackId: number;
+				Name: string;
+				ArtistName: string;
+				AlbumTitle: string;
+				Milliseconds: number;
+			},
+			{ id: number }
+		>(
+			`SELECT t.TrackId, t.Name, a.Name as ArtistName, al.Title as AlbumTitle, t.Milliseconds
+			 FROM playlist_track pt
+			 JOIN tracks t ON pt.TrackId = t.TrackId
+			 LEFT JOIN albums al ON t.AlbumId = al.AlbumId
+			 LEFT JOIN artists a ON al.ArtistId = a.ArtistId
+			 WHERE pt.PlaylistId = $id
+			 ORDER BY t.Name`,
+		)
+		.all({ id });
+
+	return { playlist, tracks };
+});
+
+export const get_customer = query(idSchema, async (id) => {
+	const customer = db
+		.query<
+			{
+				CustomerId: number;
+				FirstName: string;
+				LastName: string;
+				Company: string | null;
+				Address: string | null;
+				City: string | null;
+				State: string | null;
+				Country: string | null;
+				PostalCode: string | null;
+				Phone: string | null;
+				Email: string;
+			},
+			{ id: number }
+		>(
+			`SELECT CustomerId, FirstName, LastName, Company, Address, City, State, Country, PostalCode, Phone, Email
+			 FROM customers WHERE CustomerId = $id`,
+		)
+		.get({ id });
+
+	if (!customer) return null;
+
+	const invoices = db
+		.query<
+			{ InvoiceId: number; InvoiceDate: string; Total: number },
+			{ id: number }
+		>(
+			`SELECT InvoiceId, InvoiceDate, Total
+			 FROM invoices
+			 WHERE CustomerId = $id
+			 ORDER BY InvoiceDate DESC`,
+		)
+		.all({ id });
+
+	return { customer, invoices };
+});
+
+export const get_invoice = query(idSchema, async (id) => {
+	const invoice = db
+		.query<
+			{
+				InvoiceId: number;
+				InvoiceDate: string;
+				CustomerId: number;
+				CustomerName: string;
+				BillingAddress: string | null;
+				BillingCity: string | null;
+				BillingState: string | null;
+				BillingCountry: string | null;
+				BillingPostalCode: string | null;
+				Total: number;
+			},
+			{ id: number }
+		>(
+			`SELECT i.InvoiceId, i.InvoiceDate, i.CustomerId,
+			        c.FirstName || ' ' || c.LastName as CustomerName,
+			        i.BillingAddress, i.BillingCity, i.BillingState,
+			        i.BillingCountry, i.BillingPostalCode, i.Total
+			 FROM invoices i
+			 JOIN customers c ON i.CustomerId = c.CustomerId
+			 WHERE i.InvoiceId = $id`,
+		)
+		.get({ id });
+
+	if (!invoice) return null;
+
+	const items = db
+		.query<
+			{
+				TrackId: number;
+				TrackName: string;
+				ArtistName: string;
+				UnitPrice: number;
+				Quantity: number;
+			},
+			{ id: number }
+		>(
+			`SELECT t.TrackId, t.Name as TrackName, a.Name as ArtistName,
+			        ii.UnitPrice, ii.Quantity
+			 FROM invoice_items ii
+			 JOIN tracks t ON ii.TrackId = t.TrackId
+			 LEFT JOIN albums al ON t.AlbumId = al.AlbumId
+			 LEFT JOIN artists a ON al.ArtistId = a.ArtistId
+			 WHERE ii.InvoiceId = $id`,
+		)
+		.all({ id });
+
+	return { invoice, items };
+});
