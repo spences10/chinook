@@ -1,8 +1,8 @@
 <script lang="ts">
 	let { data } = $props();
 
-	function formatDate(dateStr: string) {
-		return new Date(dateStr).toLocaleDateString();
+	function format_date(date_str: string) {
+		return new Date(date_str).toLocaleDateString();
 	}
 </script>
 
@@ -21,7 +21,9 @@
 				<div>
 					<div class="font-medium">Invoice #{invoice.InvoiceId}</div>
 					<div class="text-sm text-muted-foreground">
-						{invoice.CustomerName} - {formatDate(invoice.InvoiceDate)}
+						{invoice.CustomerName} - {format_date(
+							invoice.InvoiceDate,
+						)}
 					</div>
 				</div>
 				<span class="font-medium">${invoice.Total.toFixed(2)}</span>

@@ -11,7 +11,7 @@
 
 	let { data } = $props();
 
-	const iconMap: Record<string, typeof Music> = {
+	const icon_map: Record<string, typeof Music> = {
 		artists: MicVocal,
 		albums: Disc3,
 		tracks: AudioLines,
@@ -34,7 +34,7 @@
 
 	<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
 		{#each data.stats as stat}
-			{@const Icon = iconMap[stat.table_name] || Music}
+			{@const Icon = icon_map[stat.table_name] || Music}
 			<a
 				href="/{stat.table_name}"
 				class="group relative overflow-hidden rounded-xl border bg-card p-6 transition-all hover:border-primary hover:shadow-lg"
