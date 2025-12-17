@@ -3,6 +3,63 @@ import { db } from '$lib/server/db';
 import * as v from 'valibot';
 
 const id_schema = v.number();
+const search_schema = v.object({
+	term: v.string(),
+	limit: v.optional(v.number(), 20),
+});
+
+export const search_catalog = query(
+	search_schema,
+	async ({ term, limit }) => {
+		if (!term || term.length < 2)
+			return { tracks: [], artists: [], albums: [] };
+
+		const search_term = `%${term}%`;
+
+		const tracks = db
+			.query<
+				{
+					TrackId: number;
+					Name: string;
+					ArtistName: string;
+					AlbumTitle: string;
+				},
+				[string, number]
+			>(
+				`SELECT t.TrackId, t.Name, a.Name as ArtistName, al.Title as AlbumTitle
+			 FROM tracks t
+			 LEFT JOIN albums al ON t.AlbumId = al.AlbumId
+			 LEFT JOIN artists a ON al.ArtistId = a.ArtistId
+			 WHERE t.Name LIKE ?
+			 ORDER BY t.Name
+			 LIMIT ?`,
+			)
+			.all(search_term, limit ?? 20);
+
+		const artists = db
+			.query<
+				{ ArtistId: number; Name: string },
+				[string, number]
+			>(`SELECT ArtistId, Name FROM artists WHERE Name LIKE ? ORDER BY Name LIMIT ?`)
+			.all(search_term, limit ?? 20);
+
+		const albums = db
+			.query<
+				{ AlbumId: number; Title: string; ArtistName: string },
+				[string, number]
+			>(
+				`SELECT al.AlbumId, al.Title, a.Name as ArtistName
+			 FROM albums al
+			 JOIN artists a ON al.ArtistId = a.ArtistId
+			 WHERE al.Title LIKE ?
+			 ORDER BY al.Title
+			 LIMIT ?`,
+			)
+			.all(search_term, limit ?? 20);
+
+		return { tracks, artists, albums };
+	},
+);
 
 export const get_artist = query(id_schema, async (id) => {
 	const artist = db
