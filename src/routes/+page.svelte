@@ -40,24 +40,18 @@
 		}
 	}
 
-	async function do_search(term: string) {
+	function handle_search(term: string) {
+		clearTimeout(debounce_timer);
 		if (term.length < 2) {
 			search_results = undefined;
 			return;
 		}
-		is_searching = true;
-		search_results = await search_catalog({ term });
-		is_searching = false;
+		debounce_timer = setTimeout(async () => {
+			is_searching = true;
+			search_results = await search_catalog({ term });
+			is_searching = false;
+		}, 300);
 	}
-
-	$effect(() => {
-		clearTimeout(debounce_timer);
-		if (search_value) {
-			debounce_timer = setTimeout(() => do_search(search_value), 300);
-		} else {
-			search_results = undefined;
-		}
-	});
 
 	const has_results = $derived(
 		search_results &&
@@ -102,7 +96,11 @@
 	<Command.Dialog bind:open shouldFilter={false}>
 		<Command.Input
 			placeholder="Search tracks, artists, albums..."
-			bind:value={search_value}
+			value={search_value}
+			oninput={(e) => {
+				search_value = e.currentTarget.value;
+				handle_search(e.currentTarget.value);
+			}}
 		/>
 		<Command.List>
 			{#if is_searching}
