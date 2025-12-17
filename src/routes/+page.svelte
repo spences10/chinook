@@ -169,7 +169,53 @@
 					>
 				{/if}
 			{:else}
-				<Command.Empty forceMount>Type to search...</Command.Empty>
+				<Command.Group heading="Quick Navigation">
+					<Command.Item
+						onSelect={() => {
+							open = false;
+							goto('/artists');
+						}}
+					>
+						<MicVocal class="me-2 size-4" />
+						Browse Artists
+					</Command.Item>
+					<Command.Item
+						onSelect={() => {
+							open = false;
+							goto('/albums');
+						}}
+					>
+						<Disc3 class="me-2 size-4" />
+						Browse Albums
+					</Command.Item>
+					<Command.Item
+						onSelect={() => {
+							open = false;
+							goto('/tracks');
+						}}
+					>
+						<AudioLines class="me-2 size-4" />
+						Browse Tracks
+					</Command.Item>
+					<Command.Item
+						onSelect={() => {
+							open = false;
+							goto('/genres');
+						}}
+					>
+						<Music class="me-2 size-4" />
+						Browse Genres
+					</Command.Item>
+					<Command.Item
+						onSelect={() => {
+							open = false;
+							goto('/playlists');
+						}}
+					>
+						<ListMusic class="me-2 size-4" />
+						Browse Playlists
+					</Command.Item>
+				</Command.Group>
 			{/if}
 		</Command.List>
 	</Command.Dialog>
